@@ -4,7 +4,11 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon --exec tsx src/api/index.ts",
+    "build": "prisma generate && tsc",
+    "start": "node dist/api/index.js",
+    "prisma:generate": "npx prisma generate",
+    "prisma:migrate": "npx prisma migrate dev --name init"
   },
   "keywords": [],
   "author": "",
@@ -31,6 +35,7 @@
     "nodemon": "^3.1.10",
     "prisma": "^6.16.3",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.2"
   }
 }
