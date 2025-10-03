@@ -1,13 +1,11 @@
-import { PrismaClient, User } from "@prisma/client";
+import { prisma } from "../utils/prisma"
 
-const prisma = new PrismaClient();
+export const findUserByEmail = async (email: string) => {
+    return prisma.user.findUnique({ where: { email } });
+};
 
-export const findUserByEmail = async (email: string): Promise<User> | null => {
-    return await prisma.user.findUnique({ where: { email } });
-}
-
-export const createUser = async (email: string, password: string): Promise<User> => {
-    return await prisma.user.create({
-        data: { email, password };
+export const createUser = async (email: string, password: string) => {
+    return prisma.user.create({
+        data: { email, password },
     });
-}
+};
