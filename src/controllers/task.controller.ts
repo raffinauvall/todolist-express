@@ -1,43 +1,47 @@
 import { Response } from "express";
-import { PrismaClient } from "@prisma/client";
-import type { AuthRequest } from "../middlewares/auth.middleware.js";
-
-const prisma = new PrismaClient();
+import { AuthRequest } from "../middlewares/auth.middleware";
+import { createTaskService, getTaskService, updateTaskService, deleteTaskService } from "../services/task.service";
 
 export const getTasks = async (req: AuthRequest, res: Response) => {
-  const tasks = await prisma.task.findMany({
-    where: { userId: req.userId },
-    orderBy: { createdAt: "desc" }
-  });
-  res.json(tasks);
+  try{
+    const userId = req.userId!;
+    const tasks = await getTaskService(userId);
+    res.json(tasks);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
 };
 
-export const createTasks = async (req: AuthRequest, res: Response) => {
-  const { title } = req.body;
-  const task = await prisma.task.create({
-    data: { title, userId: req.userId!, status: false }
-  });
-  res.json({ task, message: "Task successfully created." });
-};
+export const createTask = async (req: AuthRequest, res: Response) => {
+  try{
+    const { title } = req.body;
+    const userId = req.userId!;
+    const tasks = await createTaskService(title, userId);
+    res.status(200).json({ message: "Task created successfully." })
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+}
 
-export const updateTasks = async (req: AuthRequest, res: Response) => {
-  const { id } = req.params;
-  const { title, status } = req.body;
-
-  const task = await prisma.task.updateMany({
-    where: { id: Number(id), userId: req.userId },
-    data: { title, status }
-  });
-
-  res.json({ task, message: "Task successfully updated." });
-};
+export const updateTask = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { title, status } = req.body;
+    const userId = req.userId!;
+    const response = await updateTaskService(Number(id), { title, status }, userId);
+    res.json(response);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+}
 
 export const deleteTask = async (req: AuthRequest, res: Response) => {
-  const { id } = req.params;
-
-  await prisma.task.deleteMany({
-    where: { id: Number(id), userId: req.userId }
-  });
-
-  res.json({ message: "Task successfully deleted." });
-};
+  try {
+    const { id } = req.params;
+    const userId = req.userId!;
+    const response = await deleteTaskService(Number(id), userId);
+    res.json(response);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+}
