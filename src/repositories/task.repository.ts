@@ -1,38 +1,30 @@
-import { PrismaClient } from "@prisma/client";
-import { title } from "process";
+import { prisma } from "../utils/prisma"
 
-const prisma = new PrismaClient();
+export const createTask = async (title: string, userId: number) => {
+    return await prisma.task.create({
+        data: {
+            title,
+            userId
+        },
+    });
+};
 
-export class TaskRepository {
-    static async create(userId: number, title: string) {
-        return prisma.task.create({
-            data: { title, userId, status: false },
-        });
-    }
+export const getTasksByUser = async (userId: number) => {
+    return await prisma.task.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+    });
+};
 
-    static async findAllByUser(userId: number) {
-        return prisma.task.findMany({
-            where: { userId },
-            orderBy: { createdAt: "title"},
-        });
-    }
+export const updateTask = async (id: number, data: { title?: string, status?: boolean}, userId: number) => {
+    return await prisma.task.updateMany({
+        where: { id, userId },
+        data,
+    });
+};
 
-    static async findById(taskId: number, userId: number) {
-        return prisma.task.findFirst({
-            where: { id: taskId, userId },
-        });
-    }
-
-    static async update(taskId: number, userId: number, data: any) {
-        return prisma.task.updateMany({
-            where: { id: taskId, userId },
-            data,
-        });
-    }
-
-    static delete(taskId: number, userId: number) {
-        return prisma.task.deleteMany({
-            where: { id: taskId, userId}
-        });
-    }
-}
+export const deleteTask = async (id: number, userId: number) => {
+    return await prisma.task.deleteMany({
+        where: { id, userId },
+    });
+};
